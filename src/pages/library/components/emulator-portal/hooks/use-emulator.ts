@@ -172,7 +172,7 @@ export function useEmulator() {
   async function toggleMute() {
     const newMutedState = !isMuted
     setIsMuted(newMutedState)
-    
+
     try {
       // Find RetroArch's AudioContext - it's usually accessible via SDL2
       const possibleContexts = [
@@ -180,7 +180,7 @@ export function useEmulator() {
         window.Module?.SDL2?.audioContext,
         audioContext
       ].filter((ctx): ctx is AudioContext => ctx !== undefined)
-      
+
       // If no context found, try to get it from the emulator
       if (possibleContexts.length === 0 && emulator) {
         try {
@@ -190,7 +190,7 @@ export function useEmulator() {
           }
         } catch {}
       }
-      
+
       // Control all found AudioContexts
       for (const ctx of possibleContexts) {
         if (ctx && typeof ctx.suspend === 'function' && typeof ctx.resume === 'function') {
@@ -201,7 +201,7 @@ export function useEmulator() {
           }
         }
       }
-      
+
       // Store the context for future use
       if (possibleContexts.length > 0) {
         audioContext = possibleContexts[0]
