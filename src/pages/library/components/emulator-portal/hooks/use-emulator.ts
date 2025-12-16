@@ -40,7 +40,6 @@ const defaultRetroarchConfig: RetroarchConfig = {
 
 let wakeLock: undefined | WakeLockSentinel
 let audioContext: AudioContext | undefined
-let gainNode: GainNode | undefined
 const originalGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
 export function useEmulator() {
   const rom: Rom = useRom()
@@ -159,49 +158,53 @@ export function useEmulator() {
 
   function setupAudioControl() {
     try {
-      // Get or create AudioContext
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-      }
-
-      // Create a gain node if it doesn't exist
-      if (!gainNode) {
-        gainNode = audioContext.createGain()
-        
-        // Intercept the audio destination to insert our gain node
-        const destination = audioContext.destination
-        
-        // Store original connect method
-        const originalConnect = AudioNode.prototype.connect
-        
-        // Override connect to intercept audio nodes
-        AudioNode.prototype.connect = function(...args: any[]) {
-          const target = args[0]
-          // If connecting to destination, connect through gain node instead
-          if (target === destination && this !== gainNode) {
-            this.connect(gainNode)
-            gainNode.connect(destination)
-            return target
-          }
-          return originalConnect.apply(this, args as any)
-        }
-      }
-      
-      // Apply current mute state
-      if (gainNode) {
-        gainNode.gain.value = isMuted ? 0 : 1
-      }
+      // Store references to find AudioContext later
+      // RetroArch/Emscripten creates its own AudioContext
+      // We'll find and control it in toggleMute
     } catch (error) {
       console.warn('Failed to setup audio control:', error)
     }
   }
 
-  function toggleMute() {
+  async function toggleMute() {
     const newMutedState = !isMuted
     setIsMuted(newMutedState)
     
-    if (gainNode) {
-      gainNode.gain.value = newMutedState ? 0 : 1
+    try {
+      // Find RetroArch's AudioContext - it's usually accessible via SDL2
+      const possibleContexts = [
+        (window as any).SDL2?.audioContext,
+        (window as any).Module?.SDL2?.audioContext,
+        audioContext
+      ].filter(Boolean)
+      
+      // If no context found, try to get it from the emulator
+      if (possibleContexts.length === 0 && emulator) {
+        try {
+          const retroModule = (emulator.getEmulator() as any).Module
+          if (retroModule?.SDL2?.audioContext) {
+            possibleContexts.push(retroModule.SDL2.audioContext)
+          }
+        } catch {}
+      }
+      
+      // Control all found AudioContexts
+      for (const ctx of possibleContexts) {
+        if (ctx && typeof ctx.suspend === 'function' && typeof ctx.resume === 'function') {
+          if (newMutedState && ctx.state === 'running') {
+            await ctx.suspend()
+          } else if (!newMutedState && ctx.state === 'suspended') {
+            await ctx.resume()
+          }
+        }
+      }
+      
+      // Store the context for future use
+      if (possibleContexts.length > 0) {
+        audioContext = possibleContexts[0]
+      }
+    } catch (error) {
+      console.warn('Failed to toggle mute:', error)
     }
   }
 
@@ -221,9 +224,11 @@ export function useEmulator() {
       // Clean up audio context
       if (audioContext) {
         try {
-          await audioContext.close()
+          // Resume if suspended before closing
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume()
+          }
           audioContext = undefined
-          gainNode = undefined
         } catch {}
       }
       if (promises.length > 0) {
