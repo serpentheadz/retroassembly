@@ -49,6 +49,7 @@ export function GameInputMessage() {
         { keyNames: compact([keyboardMapping.$pause]), message: t('Pause') },
         { keyNames: compact([keyboardMapping.input_rewind]), message: t('Rewind') },
         { keyNames: compact([keyboardMapping.input_hold_fast_forward]), message: t('Fast forward') },
+        { keyNames: compact([keyboardMapping.input_toggle_fast_forward]), message: t('Toggle fast forward') },
       ]
 
   return messages

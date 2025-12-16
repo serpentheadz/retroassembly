@@ -60,3 +60,8 @@ const isFullscreenAtom = atom(false)
 export function useIsFullscreen() {
   return useAtom(isFullscreenAtom)
 }
+
+const isTurboEnabledAtom = atom(false)
+export function useIsTurboEnabled() {
+  return useAtom(isTurboEnabledAtom)
+}
