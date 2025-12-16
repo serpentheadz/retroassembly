@@ -58,19 +58,21 @@ let wakeLock: undefined | WakeLockSentinel
 let audioContext: AudioContext | undefined
 const originalGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
 
-// Intercept AudioContext creation to get a reference
-const OriginalAudioContext = window.AudioContext || (window as any).webkitAudioContext
-if (OriginalAudioContext && typeof OriginalAudioContext === 'function') {
-  const InterceptedAudioContext = new Proxy(OriginalAudioContext, {
-    construct(target, args) {
-      const ctx = new target(...args)
-      audioContext = ctx
-      return ctx
+// Intercept AudioContext creation to get a reference (browser only)
+if (typeof window !== 'undefined') {
+  const OriginalAudioContext = window.AudioContext || (window as any).webkitAudioContext
+  if (OriginalAudioContext && typeof OriginalAudioContext === 'function') {
+    const InterceptedAudioContext = new Proxy(OriginalAudioContext, {
+      construct(target, args) {
+        const ctx = new target(...args)
+        audioContext = ctx
+        return ctx
+      }
+    })
+    ;(window as any).AudioContext = InterceptedAudioContext
+    if ((window as any).webkitAudioContext) {
+      ;(window as any).webkitAudioContext = InterceptedAudioContext
     }
-  })
-  ;(window as any).AudioContext = InterceptedAudioContext
-  if ((window as any).webkitAudioContext) {
-    ;(window as any).webkitAudioContext = InterceptedAudioContext
   }
 }
 export function useEmulator() {
