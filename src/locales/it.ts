@@ -147,6 +147,7 @@ export const translation: ResourceLanguage = {
   Megadrive: 'Megadrive',
   Menu: 'Menu',
   Move: 'Sposta',
+  Mute: 'Muto',
   'Multi-Platform Support': 'Supporto Multi-Piattaforma',
   Name: 'Nome',
   'Navigate seamlessly using a keyboard or a gamepad without needing a mouse.':
@@ -336,6 +337,7 @@ export const translation: ResourceLanguage = {
   'Unexpected error': 'Errore imprevisto',
   Unknown: 'Sconosciuto',
   'Unknown error': 'Errore sconosciuto',
+  Unmute: 'Riattiva audio',
   'Update Password': 'Aggiorna Password',
   Upload: 'Carica',
   'Upload…': 'Carica…',

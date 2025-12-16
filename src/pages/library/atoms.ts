@@ -60,3 +60,8 @@ const isFullscreenAtom = atom(false)
 export function useIsFullscreen() {
   return useAtom(isFullscreenAtom)
 }
+
+const isMutedAtom = atom(false)
+export function useIsMuted() {
+  return useAtom(isMutedAtom)
+}

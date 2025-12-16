@@ -8,6 +8,7 @@ import type { Rom } from '#@/controllers/roms/get-roms.ts'
 import {
   useEmulatorLaunched,
   useIsFullscreen,
+  useIsMuted,
   useLaunchButton,
   useSpatialNavigationPaused,
 } from '#@/pages/library/atoms.ts'
@@ -38,6 +39,8 @@ const defaultRetroarchConfig: RetroarchConfig = {
 }
 
 let wakeLock: undefined | WakeLockSentinel
+let audioContext: AudioContext | undefined
+let gainNode: GainNode | undefined
 const originalGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
 export function useEmulator() {
   const rom: Rom = useRom()
@@ -48,6 +51,7 @@ export function useEmulator() {
   const isDemo = useIsDemo()
   const { reloadSilently } = useRouter()
   const [isFullscreen, setIsFullscreen] = useIsFullscreen()
+  const [isMuted, setIsMuted] = useIsMuted()
   const [launchButton] = useLaunchButton()
   const [, setSpatialNavigationPaused] = useSpatialNavigationPaused()
 
@@ -141,6 +145,9 @@ export function useEmulator() {
       focus('canvas')
     }
 
+    // Setup audio control for mute functionality
+    setupAudioControl()
+
     if (preference.emulator.fullscreen) {
       await toggleFullscreen()
     }
@@ -148,6 +155,54 @@ export function useEmulator() {
       wakeLock = await navigator.wakeLock.request('screen')
     } catch {}
     onCancel(noop)
+  }
+
+  function setupAudioControl() {
+    try {
+      // Get or create AudioContext
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+
+      // Create a gain node if it doesn't exist
+      if (!gainNode) {
+        gainNode = audioContext.createGain()
+        
+        // Intercept the audio destination to insert our gain node
+        const destination = audioContext.destination
+        
+        // Store original connect method
+        const originalConnect = AudioNode.prototype.connect
+        
+        // Override connect to intercept audio nodes
+        AudioNode.prototype.connect = function(...args: any[]) {
+          const target = args[0]
+          // If connecting to destination, connect through gain node instead
+          if (target === destination && this !== gainNode) {
+            this.connect(gainNode)
+            gainNode.connect(destination)
+            return target
+          }
+          return originalConnect.apply(this, args as any)
+        }
+      }
+      
+      // Apply current mute state
+      if (gainNode) {
+        gainNode.gain.value = isMuted ? 0 : 1
+      }
+    } catch (error) {
+      console.warn('Failed to setup audio control:', error)
+    }
+  }
+
+  function toggleMute() {
+    const newMutedState = !isMuted
+    setIsMuted(newMutedState)
+    
+    if (gainNode) {
+      gainNode.gain.value = newMutedState ? 0 : 1
+    }
   }
 
   async function exit({ reloadAfterExit = false } = {}) {
@@ -163,11 +218,20 @@ export function useEmulator() {
         promises.push(wakeLock.release())
         wakeLock = undefined
       }
+      // Clean up audio context
+      if (audioContext) {
+        try {
+          await audioContext.close()
+          audioContext = undefined
+          gainNode = undefined
+        } catch {}
+      }
       if (promises.length > 0) {
         await attemptAsync(() => Promise.all(promises))
       }
       setSpatialNavigationPaused(false)
       setIsFullscreen(false)
+      setIsMuted(false)
       focus(launchButton)
       offCancel()
       await attemptAsync(prepare)
@@ -213,6 +277,7 @@ export function useEmulator() {
     error,
     exit,
     isFullscreen,
+    isMuted,
     isPreparing,
     launch,
     launched,
@@ -220,5 +285,6 @@ export function useEmulator() {
     setLaunched,
     start,
     toggleFullscreen,
+    toggleMute,
   }
 }
