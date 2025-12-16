@@ -18,7 +18,7 @@ export function useGameStates() {
     isLoading: isManualStatesLoading,
     mutate: reloadManualStates,
   } = useSWRImmutable(
-    rom && showGameOverlay ? { endpoint: '/api/v1/roms/:id/states/manual', query: manualQuery } : false,
+    rom && showGameOverlay ? { endpoint: '/api/v1/states/manual', query: manualQuery } : false,
     ({ query }) => parseResponse($get({ query })),
   )
 
@@ -28,7 +28,7 @@ export function useGameStates() {
     isLoading: isAutoStatesLoading,
     mutate: reloadAutoStates,
   } = useSWRImmutable(
-    rom && showGameOverlay ? { endpoint: '/api/v1/roms/:id/states/auto', query: autoQuery } : false,
+    rom && showGameOverlay ? { endpoint: '/api/v1/states/auto', query: autoQuery } : false,
     ({ query }) => parseResponse($get({ query })),
   )
 
