@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { client } from '#@/api/client.ts'
+import { client, parseResponse } from '#@/api/client.ts'
 import { usePreference } from '#@/pages/library/hooks/use-preference.ts'
 import { useRom } from '#@/pages/library/hooks/use-rom.ts'
 import { useEmulator } from './use-emulator.ts'
@@ -37,12 +37,11 @@ export function useAutoSave() {
         const { state, thumbnail } = await emulator.saveState()
         
         // First, delete any existing auto-save state for this ROM
-        const existingStates = await $get({ query: { rom: rom.id, type: 'auto' } })
-        const parsedStates = await existingStates.json()
+        const existingStates = await parseResponse($get({ query: { rom: rom.id, type: 'auto' } }))
         
         // Delete all existing auto-save states (there should only be one, but just to be safe)
-        if (parsedStates && Array.isArray(parsedStates)) {
-          for (const existingState of parsedStates) {
+        if (existingStates && Array.isArray(existingStates)) {
+          for (const existingState of existingStates) {
             await client.states[':id'].$delete({ param: { id: existingState.id } })
           }
         }
