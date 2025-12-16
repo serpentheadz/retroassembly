@@ -147,6 +147,7 @@ export const translation: ResourceLanguage = {
   Megadrive: 'Megadrive',
   Menu: 'Menu',
   Move: 'Pohyb',
+  Mute: 'Ztlumit',
   'Multi-Platform Support': 'Podpora více platforem',
   Name: 'Název',
   'Navigate seamlessly using a keyboard or a gamepad without needing a mouse.':
@@ -332,6 +333,7 @@ export const translation: ResourceLanguage = {
   'Unexpected error': 'Neočekávaná chyba',
   Unknown: 'Neznámé',
   'Unknown error': 'Neznámá chyba',
+  Unmute: 'Zrušit ztlumení',
   'Update Password': 'Aktualizovat heslo',
   Upload: 'Nahrát',
   'Upload…': 'Nahrávání…',

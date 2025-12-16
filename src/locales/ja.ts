@@ -147,6 +147,7 @@ export const translation: ResourceLanguage = {
   Megadrive: 'メガドライブ',
   Menu: 'メニュー',
   Move: '移動',
+  Mute: 'ミュート',
   'Multi-Platform Support': 'マルチプラットフォームサポート',
   Name: '名前',
   'Navigate seamlessly using a keyboard or a gamepad without needing a mouse.':
@@ -334,6 +335,7 @@ export const translation: ResourceLanguage = {
   'Unexpected error': '予期しないエラー',
   Unknown: '不明',
   'Unknown error': '不明なエラー',
+  Unmute: 'ミュート解除',
   'Update Password': 'パスワードを更新',
   Upload: 'アップロード',
   'Upload…': 'アップロード…',

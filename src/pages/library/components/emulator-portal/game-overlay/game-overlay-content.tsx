@@ -28,7 +28,7 @@ export function GameOverlayContent() {
   const { hide, visible } = useGameOverlay()
   const goodcodes = getRomGoodcodes(rom)
   const { data: cover } = useRomCover(rom)
-  const { emulator, isFullscreen, toggleFullscreen } = useEmulator()
+  const { emulator, isFullscreen, isMuted, toggleFullscreen, toggleMute } = useEmulator()
 
   useEffect(() => {
     const status = emulator?.getStatus()
@@ -76,6 +76,15 @@ export function GameOverlayContent() {
             <div className='hidden flex-1 items-center justify-center gap-4 lg:flex'>
               <GameInputMessage />
             </div>
+            {isMuted ? (
+              <ControllerButton onClick={toggleMute} title={t('Unmute')}>
+                <span className='icon-[mdi--volume-off]' />
+              </ControllerButton>
+            ) : (
+              <ControllerButton onClick={toggleMute} title={t('Mute')}>
+                <span className='icon-[mdi--volume-high]' />
+              </ControllerButton>
+            )}
             {isFullscreen ? (
               <ControllerButton onClick={toggleFullscreen} title={t('Exit fullscreen')}>
                 <span className='icon-[mdi--fullscreen-exit]' />

@@ -147,6 +147,7 @@ export const translation: ResourceLanguage = {
   Megadrive: 'Megadrive',
   Menu: '메뉴',
   Move: '이동',
+  Mute: '음소거',
   'Multi-Platform Support': '멀티 플랫폼 지원',
   Name: '이름',
   'Navigate seamlessly using a keyboard or a gamepad without needing a mouse.':
@@ -331,6 +332,7 @@ export const translation: ResourceLanguage = {
   'Unexpected error': '예기치 않은 오류',
   Unknown: '알 수 없음',
   'Unknown error': '알 수 없는 오류',
+  Unmute: '음소거 해제',
   'Update Password': '비밀번호 업데이트',
   Upload: '업로드',
   'Upload…': '업로드…',

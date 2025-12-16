@@ -8,6 +8,7 @@ import type { Rom } from '#@/controllers/roms/get-roms.ts'
 import {
   useEmulatorLaunched,
   useIsFullscreen,
+  useIsMuted,
   useLaunchButton,
   useSpatialNavigationPaused,
 } from '#@/pages/library/atoms.ts'
@@ -20,6 +21,22 @@ import { focus, offCancel, onCancel } from '#@/pages/library/utils/spatial-navig
 import type { loader } from '#@/pages/routes/library-platform-rom.tsx'
 import { getCDNUrl } from '#@/utils/isomorphic/cdn.ts'
 import { usePreference } from '../../../hooks/use-preference.ts'
+
+// Type definitions for RetroArch/Emscripten global objects
+interface SDL2Audio {
+  audioContext?: AudioContext
+}
+
+interface EmscriptenModule {
+  SDL2?: SDL2Audio
+}
+
+declare global {
+  interface Window {
+    SDL2?: SDL2Audio
+    Module?: EmscriptenModule
+  }
+}
 
 type NostalgistOption = Parameters<typeof Nostalgist.prepare>[0]
 type RetroarchConfig = Partial<NostalgistOption['retroarchConfig']>
@@ -38,7 +55,24 @@ const defaultRetroarchConfig: RetroarchConfig = {
 }
 
 let wakeLock: undefined | WakeLockSentinel
+let audioContext: AudioContext | undefined
 const originalGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
+
+// Intercept AudioContext creation to get a reference
+const OriginalAudioContext = window.AudioContext || (window as any).webkitAudioContext
+if (OriginalAudioContext && typeof OriginalAudioContext === 'function') {
+  const InterceptedAudioContext = new Proxy(OriginalAudioContext, {
+    construct(target, args) {
+      const ctx = new target(...args)
+      audioContext = ctx
+      return ctx
+    }
+  })
+  ;(window as any).AudioContext = InterceptedAudioContext
+  if ((window as any).webkitAudioContext) {
+    ;(window as any).webkitAudioContext = InterceptedAudioContext
+  }
+}
 export function useEmulator() {
   const rom: Rom = useRom()
   const { state } = useLoaderData<typeof loader>()
@@ -48,6 +82,7 @@ export function useEmulator() {
   const isDemo = useIsDemo()
   const { reloadSilently } = useRouter()
   const [isFullscreen, setIsFullscreen] = useIsFullscreen()
+  const [isMuted, setIsMuted] = useIsMuted()
   const [launchButton] = useLaunchButton()
   const [, setSpatialNavigationPaused] = useSpatialNavigationPaused()
 
@@ -150,6 +185,54 @@ export function useEmulator() {
     onCancel(noop)
   }
 
+  async function toggleMute() {
+    const newMutedState = !isMuted
+    setIsMuted(newMutedState)
+
+    try {
+      // Find AudioContext if not already captured from interception
+      if (!audioContext) {
+        const possibleContexts = [
+          window.SDL2?.audioContext,
+          window.Module?.SDL2?.audioContext,
+        ].filter((ctx): ctx is AudioContext => ctx !== undefined)
+
+        // Try to get it from the emulator module
+        if (possibleContexts.length === 0 && emulator) {
+          try {
+            const retroModule = emulator.getEmulator() as { Module?: EmscriptenModule }
+            if (retroModule?.Module?.SDL2?.audioContext) {
+              possibleContexts.push(retroModule.Module.SDL2.audioContext)
+            }
+          } catch {}
+        }
+
+        if (possibleContexts.length > 0) {
+          audioContext = possibleContexts[0]
+        }
+      }
+
+      // Control the AudioContext via suspend/resume
+      if (audioContext) {
+        if (newMutedState && audioContext.state === 'running') {
+          await audioContext.suspend()
+        } else if (!newMutedState && audioContext.state === 'suspended') {
+          await audioContext.resume()
+        }
+      }
+
+      // Fallback: mute any HTML5 audio/video elements
+      const mediaElements = document.querySelectorAll('audio, video')
+      mediaElements.forEach((element) => {
+        if (element instanceof HTMLMediaElement) {
+          element.muted = newMutedState
+        }
+      })
+    } catch (error) {
+      console.warn('Failed to toggle mute:', error)
+    }
+  }
+
   async function exit({ reloadAfterExit = false } = {}) {
     const status = emulator?.getStatus() || ''
     if (['paused', 'running'].includes(status)) {
@@ -163,11 +246,22 @@ export function useEmulator() {
         promises.push(wakeLock.release())
         wakeLock = undefined
       }
+      // Clean up audio context
+      if (audioContext) {
+        try {
+          // Resume if suspended before closing
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume()
+          }
+          audioContext = undefined
+        } catch {}
+      }
       if (promises.length > 0) {
         await attemptAsync(() => Promise.all(promises))
       }
       setSpatialNavigationPaused(false)
       setIsFullscreen(false)
+      setIsMuted(false)
       focus(launchButton)
       offCancel()
       await attemptAsync(prepare)
@@ -213,6 +307,7 @@ export function useEmulator() {
     error,
     exit,
     isFullscreen,
+    isMuted,
     isPreparing,
     launch,
     launched,
@@ -220,5 +315,6 @@ export function useEmulator() {
     setLaunched,
     start,
     toggleFullscreen,
+    toggleMute,
   }
 }
