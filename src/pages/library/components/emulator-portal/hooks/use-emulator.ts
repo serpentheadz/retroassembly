@@ -22,6 +22,22 @@ import type { loader } from '#@/pages/routes/library-platform-rom.tsx'
 import { getCDNUrl } from '#@/utils/isomorphic/cdn.ts'
 import { usePreference } from '../../../hooks/use-preference.ts'
 
+// Type definitions for RetroArch/Emscripten global objects
+interface SDL2Audio {
+  audioContext?: AudioContext
+}
+
+interface EmscriptenModule {
+  SDL2?: SDL2Audio
+}
+
+declare global {
+  interface Window {
+    SDL2?: SDL2Audio
+    Module?: EmscriptenModule
+  }
+}
+
 type NostalgistOption = Parameters<typeof Nostalgist.prepare>[0]
 type RetroarchConfig = Partial<NostalgistOption['retroarchConfig']>
 
@@ -144,9 +160,6 @@ export function useEmulator() {
       focus('canvas')
     }
 
-    // Setup audio control for mute functionality
-    setupAudioControl()
-
     if (preference.emulator.fullscreen) {
       await toggleFullscreen()
     }
@@ -156,16 +169,6 @@ export function useEmulator() {
     onCancel(noop)
   }
 
-  function setupAudioControl() {
-    try {
-      // Store references to find AudioContext later
-      // RetroArch/Emscripten creates its own AudioContext
-      // We'll find and control it in toggleMute
-    } catch (error) {
-      console.warn('Failed to setup audio control:', error)
-    }
-  }
-
   async function toggleMute() {
     const newMutedState = !isMuted
     setIsMuted(newMutedState)
@@ -173,17 +176,17 @@ export function useEmulator() {
     try {
       // Find RetroArch's AudioContext - it's usually accessible via SDL2
       const possibleContexts = [
-        (window as any).SDL2?.audioContext,
-        (window as any).Module?.SDL2?.audioContext,
+        window.SDL2?.audioContext,
+        window.Module?.SDL2?.audioContext,
         audioContext
-      ].filter(Boolean)
+      ].filter((ctx): ctx is AudioContext => ctx !== undefined)
       
       // If no context found, try to get it from the emulator
       if (possibleContexts.length === 0 && emulator) {
         try {
-          const retroModule = (emulator.getEmulator() as any).Module
-          if (retroModule?.SDL2?.audioContext) {
-            possibleContexts.push(retroModule.SDL2.audioContext)
+          const retroModule = emulator.getEmulator() as { Module?: EmscriptenModule }
+          if (retroModule?.Module?.SDL2?.audioContext) {
+            possibleContexts.push(retroModule.Module.SDL2.audioContext)
           }
         } catch {}
       }
