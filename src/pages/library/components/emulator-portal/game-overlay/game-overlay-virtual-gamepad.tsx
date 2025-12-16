@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { useEmulatorLaunched } from '#@/pages/library/atoms.ts'
 import { useGamepads } from '#@/pages/library/hooks/use-gamepads.ts'
+import { useRom } from '#@/pages/library/hooks/use-rom.ts'
 import { useGameOverlay } from '../hooks/use-game-overlay.ts'
 import { VirtualGamepadButton } from './virtual-gamepad-button.tsx'
 
@@ -23,10 +24,22 @@ export function GameOverlayVirtualGamepad() {
   const [gamepadVisible, setGamepadVisible] = useState(!connected)
   const { show } = useGameOverlay()
   const [launched] = useEmulatorLaunched()
+  const rom = useRom()
 
   if (!launched) {
     return
   }
+
+  // Determine which buttons to show based on platform
+  const platform = rom?.platform
+  const isGameBoy = platform === 'gb' || platform === 'gbc'
+  const isGameBoyAdvance = platform === 'gba'
+  const isGameBoyFamily = isGameBoy || isGameBoyAdvance
+
+  // GameBoy/GBC have: D-pad, A, B, Start, Select
+  // GBA has: D-pad, A, B, Start, Select, L, R
+  const showShoulderButtons = isGameBoyAdvance
+  const showXYButtons = !isGameBoyFamily
 
   return (
     <div className='fixed inset-0 block lg:hidden'>
@@ -50,14 +63,13 @@ export function GameOverlayVirtualGamepad() {
       <div
         className={twMerge('bottom-safe left-safe absolute flex flex-col gap-2 p-2', clsx({ hidden: !gamepadVisible }))}
       >
-        <div className='flex w-full gap-2'>
-          <VirtualGamepadButton buttonName='l' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-            L1
-          </VirtualGamepadButton>
-          <VirtualGamepadButton buttonName='l2' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-            L2
-          </VirtualGamepadButton>
-        </div>
+        {showShoulderButtons && (
+          <div className='flex w-full gap-2'>
+            <VirtualGamepadButton buttonName='l' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
+              L
+            </VirtualGamepadButton>
+          </div>
+        )}
         <div className='grid grid-cols-3 overflow-hidden rounded-xl ring ring-white/20 *:size-14'>
           {dpadButtons.map(({ buttonNames, icon }) =>
             buttonNames.length > 0 ? (
@@ -81,21 +93,24 @@ export function GameOverlayVirtualGamepad() {
           clsx({ hidden: !gamepadVisible }),
         )}
       >
-        <div className='flex w-full gap-2'>
-          <VirtualGamepadButton buttonName='r2' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-            R2
-          </VirtualGamepadButton>
-          <VirtualGamepadButton buttonName='r' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-            R1
-          </VirtualGamepadButton>
-        </div>
+        {showShoulderButtons && (
+          <div className='flex w-full gap-2'>
+            <VirtualGamepadButton buttonName='r' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
+              R
+            </VirtualGamepadButton>
+          </div>
+        )}
         <div className='grid grid-cols-3 grid-rows-3 *:size-14 *:rounded-full'>
-          <VirtualGamepadButton buttonName='x' className='col-start-2 row-start-1 ring ring-white/20'>
-            X
-          </VirtualGamepadButton>
-          <VirtualGamepadButton buttonName='y' className='col-start-1 row-start-2 ring ring-white/20'>
-            Y
-          </VirtualGamepadButton>
+          {showXYButtons && (
+            <VirtualGamepadButton buttonName='x' className='col-start-2 row-start-1 ring ring-white/20'>
+              X
+            </VirtualGamepadButton>
+          )}
+          {showXYButtons && (
+            <VirtualGamepadButton buttonName='y' className='col-start-1 row-start-2 ring ring-white/20'>
+              Y
+            </VirtualGamepadButton>
+          )}
           <VirtualGamepadButton buttonName='a' className='col-start-3 row-start-2 ring ring-white/20'>
             A
           </VirtualGamepadButton>
