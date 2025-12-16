@@ -56,18 +56,18 @@ const defaultRetroarchConfig: RetroarchConfig = {
 
 let wakeLock: undefined | WakeLockSentinel
 let audioContext: AudioContext | undefined
-let gainNode: GainNode | undefined
 const originalGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
 
 // Intercept AudioContext creation to get a reference
 const OriginalAudioContext = window.AudioContext || (window as any).webkitAudioContext
 if (OriginalAudioContext && typeof OriginalAudioContext === 'function') {
-  const InterceptedAudioContext = function(this: AudioContext, ...args: any[]) {
-    const ctx = new OriginalAudioContext(...args)
-    audioContext = ctx
-    return ctx
-  } as any
-  InterceptedAudioContext.prototype = OriginalAudioContext.prototype
+  const InterceptedAudioContext = new Proxy(OriginalAudioContext, {
+    construct(target, args) {
+      const ctx = new target(...args)
+      audioContext = ctx
+      return ctx
+    }
+  })
   ;(window as any).AudioContext = InterceptedAudioContext
   if ((window as any).webkitAudioContext) {
     ;(window as any).webkitAudioContext = InterceptedAudioContext
@@ -190,15 +190,14 @@ export function useEmulator() {
     setIsMuted(newMutedState)
 
     try {
-      // Method 1: Use captured AudioContext from interception
+      // Find AudioContext if not already captured from interception
       if (!audioContext) {
-        // Try to find existing AudioContext
         const possibleContexts = [
           window.SDL2?.audioContext,
           window.Module?.SDL2?.audioContext,
         ].filter((ctx): ctx is AudioContext => ctx !== undefined)
 
-        // If no context found, try to get it from the emulator
+        // Try to get it from the emulator module
         if (possibleContexts.length === 0 && emulator) {
           try {
             const retroModule = emulator.getEmulator() as { Module?: EmscriptenModule }
@@ -213,16 +212,7 @@ export function useEmulator() {
         }
       }
 
-      // Method 2: Create a gain node if we have an AudioContext
-      if (audioContext && !gainNode) {
-        try {
-          gainNode = audioContext.createGain()
-          // We need to connect this gain node between the audio source and destination
-          // Since we can't easily intercept existing connections, we'll use a different approach
-        } catch {}
-      }
-
-      // Method 3: Control the AudioContext directly via suspend/resume
+      // Control the AudioContext via suspend/resume
       if (audioContext) {
         if (newMutedState && audioContext.state === 'running') {
           await audioContext.suspend()
@@ -231,7 +221,7 @@ export function useEmulator() {
         }
       }
 
-      // Method 4: Fallback - mute any HTML5 audio/video elements
+      // Fallback: mute any HTML5 audio/video elements
       const mediaElements = document.querySelectorAll('audio, video')
       mediaElements.forEach((element) => {
         if (element instanceof HTMLMediaElement) {
@@ -264,7 +254,6 @@ export function useEmulator() {
             await audioContext.resume()
           }
           audioContext = undefined
-          gainNode = undefined
         } catch {}
       }
       if (promises.length > 0) {
