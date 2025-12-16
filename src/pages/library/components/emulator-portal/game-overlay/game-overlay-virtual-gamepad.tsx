@@ -64,11 +64,9 @@ export function GameOverlayVirtualGamepad() {
         className={twMerge('bottom-safe left-safe absolute flex flex-col gap-2 p-2', clsx({ hidden: !gamepadVisible }))}
       >
         {showShoulderButtons && (
-          <div className='flex w-full gap-2'>
-            <VirtualGamepadButton buttonName='l' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-              L
-            </VirtualGamepadButton>
-          </div>
+          <VirtualGamepadButton buttonName='l' className='w-full rounded px-2 py-1 ring ring-white/20'>
+            L
+          </VirtualGamepadButton>
         )}
         <div className='grid grid-cols-3 overflow-hidden rounded-xl ring ring-white/20 *:size-14'>
           {dpadButtons.map(({ buttonNames, icon }) =>
@@ -94,11 +92,9 @@ export function GameOverlayVirtualGamepad() {
         )}
       >
         {showShoulderButtons && (
-          <div className='flex w-full gap-2'>
-            <VirtualGamepadButton buttonName='r' className='flex-1 rounded px-2 py-1 ring ring-white/20'>
-              R
-            </VirtualGamepadButton>
-          </div>
+          <VirtualGamepadButton buttonName='r' className='w-full rounded px-2 py-1 ring ring-white/20'>
+            R
+          </VirtualGamepadButton>
         )}
         <div className='grid grid-cols-3 grid-rows-3 *:size-14 *:rounded-full'>
           {showXYButtons && (
