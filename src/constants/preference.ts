@@ -177,6 +177,7 @@ export function resolveUserPreference(rawUserPreference: null | PreferenceSnippe
   const userKeyboardMapping = userPreference.input?.keyboardMapping
 
   if (userKeyboardMapping && fallbackPreference.input && 'keyboardMapping' in fallbackPreference.input) {
+    // @ts-expect-error force delete this field
     fallbackPreference.input.keyboardMapping = undefined
   }
 
