@@ -8,6 +8,7 @@ import type { Rom } from '#@/controllers/roms/get-roms.ts'
 import {
   useEmulatorLaunched,
   useIsFullscreen,
+  useIsTurboEnabled,
   useLaunchButton,
   useSpatialNavigationPaused,
 } from '#@/pages/library/atoms.ts'
@@ -50,6 +51,7 @@ export function useEmulator() {
   const [isFullscreen, setIsFullscreen] = useIsFullscreen()
   const [launchButton] = useLaunchButton()
   const [, setSpatialNavigationPaused] = useSpatialNavigationPaused()
+  const [, setIsTurboEnabled] = useIsTurboEnabled()
 
   const romUrl = isDemo
     ? // @ts-expect-error we can guarantee the platform is supported here
@@ -155,6 +157,7 @@ export function useEmulator() {
     if (['paused', 'running'].includes(status)) {
       emulator?.exit()
       setLaunched(false)
+      setIsTurboEnabled(false) // Reset turbo state on exit
       const promises: Promise<void>[] = []
       if (document.fullscreenElement) {
         promises.push(document.exitFullscreen())

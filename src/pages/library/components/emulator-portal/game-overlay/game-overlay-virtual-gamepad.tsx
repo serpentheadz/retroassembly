@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import { useEmulatorLaunched } from '#@/pages/library/atoms.ts'
 import { useGamepads } from '#@/pages/library/hooks/use-gamepads.ts'
 import { useGameOverlay } from '../hooks/use-game-overlay.ts'
+import { useTurboToggle } from '../hooks/use-turbo-toggle.ts'
 import { VirtualGamepadButton } from './virtual-gamepad-button.tsx'
 
 const dpadButtons = [
@@ -23,6 +24,7 @@ export function GameOverlayVirtualGamepad() {
   const [gamepadVisible, setGamepadVisible] = useState(!connected)
   const { show } = useGameOverlay()
   const [launched] = useEmulatorLaunched()
+  const { isTurboEnabled, toggleTurbo } = useTurboToggle()
 
   if (!launched) {
     return
@@ -36,6 +38,20 @@ export function GameOverlayVirtualGamepad() {
           onClick={async () => await show()}
         >
           <span className='icon-[mdi--pause]' />
+        </VirtualGamepadButton>
+
+        <VirtualGamepadButton
+          className={twMerge(
+            'left-safe absolute left-14 rounded p-2',
+            clsx(
+              { hidden: !gamepadVisible },
+              isTurboEnabled ? 'bg-white text-(--color-text)' : 'bg-black/20 text-white/50',
+            ),
+          )}
+          onClick={() => toggleTurbo()}
+          title='Toggle turbo'
+        >
+          <span className='icon-[mdi--fast-forward]' />
         </VirtualGamepadButton>
 
         <VirtualGamepadButton

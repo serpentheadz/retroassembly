@@ -50,6 +50,7 @@ export interface Preference {
     keyboardMapping: {
       $pause: string
       input_hold_fast_forward: string
+      input_toggle_fast_forward: string
       input_player1_a: string
       input_player1_b: string
       input_player1_down: string
@@ -133,6 +134,7 @@ export const defaultPreference: ResolvedPreference = {
     keyboardMapping: {
       $pause: 'escape',
       input_hold_fast_forward: 'space',
+      input_toggle_fast_forward: 't',
       input_player1_a: 'x',
       input_player1_b: 'z',
       input_player1_down: 'down',
@@ -175,7 +177,6 @@ export function resolveUserPreference(rawUserPreference: null | PreferenceSnippe
   const userKeyboardMapping = userPreference.input?.keyboardMapping
 
   if (userKeyboardMapping && fallbackPreference.input && 'keyboardMapping' in fallbackPreference.input) {
-    // @ts-expect-error force delete this field
     fallbackPreference.input.keyboardMapping = undefined
   }
 

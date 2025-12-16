@@ -5,6 +5,7 @@ import { useKeyboardMapping } from '#@/pages/library/hooks/use-keyboard-mapping.
 import { getKeyNameFromCode } from '#@/pages/library/utils/keyboard.ts'
 import { Gamepad } from '#@/utils/client/gamepad.ts'
 import { useGameOverlay } from '../hooks/use-game-overlay.ts'
+import { useTurboToggle } from '../hooks/use-turbo-toggle.ts'
 import { GameOverlayContent } from './game-overlay-content.tsx'
 import { GameOverlayController } from './game-overlay-controller.tsx'
 import { GameOverlayVirtualGamepad } from './game-overlay-virtual-gamepad.tsx'
@@ -13,17 +14,22 @@ export function GameOverlay() {
   const keyboardMapping = useKeyboardMapping()
   const gamepadMapping = useGamepadMapping()
   const { toggle } = useGameOverlay()
+  const { toggleTurbo } = useTurboToggle()
 
   useEffect(() => {
     async function handleKeydown(event: KeyboardEvent) {
-      if (getKeyNameFromCode(event.code) === keyboardMapping.$pause) {
+      const keyName = getKeyNameFromCode(event.code)
+      if (keyName === keyboardMapping.$pause) {
         event.preventDefault()
         await toggle()
+      } else if (keyName === keyboardMapping.input_toggle_fast_forward) {
+        event.preventDefault()
+        toggleTurbo()
       }
     }
     document.body.addEventListener('keydown', handleKeydown)
     return () => document.body.removeEventListener('keydown', handleKeydown)
-  }, [toggle, keyboardMapping.$pause])
+  }, [toggle, toggleTurbo, keyboardMapping.$pause, keyboardMapping.input_toggle_fast_forward])
 
   useEffect(
     () =>
