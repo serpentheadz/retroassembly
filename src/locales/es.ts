@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     'Obtener automáticamente las carátulas de juegos para mejorar el atractivo visual de tu biblioteca.',
   'Automatic Boxart Retrieval': 'Obtención Automática de Carátulas',
+  'Auto-Save': 'Guardado Automático',
+  'Auto-Save Interval': 'Intervalo de Guardado Automático',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    'Guarda automáticamente el estado del juego a intervalos regulares para evitar la pérdida de progreso.',
+  'Disabled (0 seconds)': 'Desactivado (0 segundos)',
+  '{{minutes}} minute': '{{minutes}} minuto',
+  '{{minutes}} minute_other': '{{minutes}} minutos',
   Back: 'Atrás',
   'Bilinear filtering': 'Filtrado bilineal',
   BIOS: 'BIOS',

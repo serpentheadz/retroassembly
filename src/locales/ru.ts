@@ -38,6 +38,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     'Автоматически загружать обложки игр для улучшения визуального оформления библиотеки.',
   'Automatic Boxart Retrieval': 'Автоматическое получение обложек',
+  'Auto-Save': 'Автосохранение',
+  'Auto-Save Interval': 'Интервал автосохранения',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    'Автоматическое сохранение состояния игры через регулярные интервалы для предотвращения потери прогресса.',
+  'Disabled (0 seconds)': 'Отключено (0 секунд)',
+  '{{minutes}} minute': '{{minutes}} минута',
+  '{{minutes}} minute_other': '{{minutes}} минут',
   Back: 'Назад',
   'Bilinear filtering': 'Билинейная фильтрация',
   BIOS: 'BIOS',

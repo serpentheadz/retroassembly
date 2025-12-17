@@ -22,12 +22,15 @@ export function GameStates() {
       </h3>
 
       {[
-        { states: manual, type: 'manual' },
-        { states: auto, type: 'auto' },
+        { label: 'Auto-Save', states: auto, type: 'auto' },
+        { label: 'Save State', states: manual, type: 'manual' },
       ]
         .filter(({ states }) => states)
-        .map(({ states, type }) => (
+        .map(({ label, states, type }) => (
           <div key={type}>
+            {states && states.length > 0 && (
+              <h4 className='mb-2 text-lg font-medium text-gray-11'>{t(label)}</h4>
+            )}
             <ScrollArea className='overflow-visible! lg:overflow-hidden!' size='2'>
               <div className='flex flex-col flex-nowrap items-center gap-8 pb-4 lg:flex-row'>
                 {states.map((state) => (

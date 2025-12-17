@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     'ゲームのボックスアートを自動的に取得して、ライブラリの視覚的な魅力を高めます。',
   'Automatic Boxart Retrieval': 'ボックスアート自動取得',
+  'Auto-Save': '自動保存',
+  'Auto-Save Interval': '自動保存間隔',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    '進行状況の損失を防ぐために、一定間隔でゲームの状態を自動的に保存します。',
+  'Disabled (0 seconds)': '無効（0秒）',
+  '{{minutes}} minute': '{{minutes}}分',
+  '{{minutes}} minute_other': '{{minutes}}分',
   Back: '戻る',
   'Bilinear filtering': 'バイリニアフィルタリング',
   BIOS: 'BIOS',

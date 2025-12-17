@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     "Récupérer automatiquement les jaquettes de jeux pour améliorer l'apparence visuelle de votre bibliothèque.",
   'Automatic Boxart Retrieval': 'Récupération automatique des jaquettes',
+  'Auto-Save': 'Sauvegarde automatique',
+  'Auto-Save Interval': 'Intervalle de sauvegarde automatique',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    'Sauvegarde automatiquement l\'état du jeu à intervalles réguliers pour éviter la perte de progression.',
+  'Disabled (0 seconds)': 'Désactivé (0 secondes)',
+  '{{minutes}} minute': '{{minutes}} minute',
+  '{{minutes}} minute_other': '{{minutes}} minutes',
   Back: 'Retour',
   'Bilinear filtering': 'Filtrage bilinéaire',
   BIOS: 'BIOS',

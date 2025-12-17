@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     'Obter automaticamente as capas dos jogos para melhorar o apelo visual da sua biblioteca.',
   'Automatic Boxart Retrieval': 'Obtenção Automática de Capas',
+  'Auto-Save': 'Salvamento Automático',
+  'Auto-Save Interval': 'Intervalo de Salvamento Automático',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    'Salva automaticamente o estado do jogo em intervalos regulares para evitar a perda de progresso.',
+  'Disabled (0 seconds)': 'Desativado (0 segundos)',
+  '{{minutes}} minute': '{{minutes}} minuto',
+  '{{minutes}} minute_other': '{{minutes}} minutos',
   Back: 'Voltar',
   'Bilinear filtering': 'Filtro bilinear',
   BIOS: 'BIOS',

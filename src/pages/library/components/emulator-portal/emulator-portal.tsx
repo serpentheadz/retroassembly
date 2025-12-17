@@ -3,11 +3,15 @@ import { useNavigation } from 'react-router'
 import { RadixThemePortal } from '#@/pages/components/radix-theme-portal.tsx'
 import { GameAnimatePresence } from './game-animate-presence.tsx'
 import { GameOverlay } from './game-overlay/game-overlay.tsx'
+import { useAutoSave } from './hooks/use-auto-save.ts'
 import { useEmulator } from './hooks/use-emulator.ts'
 
 export function EmulatorPortal() {
   const navigation = useNavigation()
   const { exit } = useEmulator()
+  
+  // Initialize auto-save functionality
+  useAutoSave()
 
   useLayoutEffect(() => {
     if (navigation.state === 'loading') {
