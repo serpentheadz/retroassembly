@@ -11,6 +11,7 @@ export function useAutoSave() {
   const { core, emulator, launched } = useEmulator()
   const { preference } = usePreference()
   const timerRef = useRef<number>()
+  const launchTimeRef = useRef<number>()
 
   useEffect(() => {
     // Clear any existing timer
@@ -22,7 +23,13 @@ export function useAutoSave() {
     // Only set up auto-save if emulator is launched and interval is configured
     const interval = preference.emulator.autoSaveInterval
     if (!launched || !emulator || !core || !rom || interval === 0) {
+      launchTimeRef.current = undefined
       return
+    }
+
+    // Record when emulator was launched
+    if (!launchTimeRef.current) {
+      launchTimeRef.current = Date.now()
     }
 
     // Create auto-save function
@@ -31,6 +38,13 @@ export function useAutoSave() {
         const status = emulator.getStatus()
         // Only auto-save if game is actually running or paused
         if (status !== 'running' && status !== 'paused') {
+          return
+        }
+
+        // Ensure emulator has been running for at least 30 seconds before first auto-save
+        // This gives the game time to fully initialize
+        const timeSinceLaunch = Date.now() - (launchTimeRef.current || 0)
+        if (timeSinceLaunch < 30000) {
           return
         }
 
