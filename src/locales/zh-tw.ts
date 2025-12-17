@@ -36,6 +36,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     '自動獲取遊戲封面圖片以增強您遊戲庫的視覺吸引力。',
   'Automatic Boxart Retrieval': '自動封面圖片獲取',
+  'Auto-Save': '自動保存',
+  'Auto-Save Interval': '自動保存間隔',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    '定期自動保存遊戲狀態，以防止進度丟失。',
+  'Disabled (0 seconds)': '已停用（0秒）',
+  '{{minutes}} minute': '{{minutes}}分鐘',
+  '{{minutes}} minute_other': '{{minutes}}分鐘',
   Back: '返回',
   'Bilinear filtering': '雙線性過濾',
   BIOS: 'BIOS',

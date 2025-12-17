@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     '게임 박스아트를 자동으로 가져와 라이브러리의 시각적 매력을 향상시킵니다.',
   'Automatic Boxart Retrieval': '자동 박스아트 검색',
+  'Auto-Save': '자동 저장',
+  'Auto-Save Interval': '자동 저장 간격',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    '진행 상황 손실을 방지하기 위해 일정한 간격으로 게임 상태를 자동으로 저장합니다.',
+  'Disabled (0 seconds)': '비활성화 (0초)',
+  '{{minutes}} minute': '{{minutes}}분',
+  '{{minutes}} minute_other': '{{minutes}}분',
   Back: '뒤로',
   'Bilinear filtering': '바이리니어 필터링',
   BIOS: 'BIOS',

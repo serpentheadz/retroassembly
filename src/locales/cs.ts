@@ -39,6 +39,13 @@ export const translation: ResourceLanguage = {
   "Automatically fetch game boxarts to enhance your library's visual appeal.":
     'Automaticky stahovat obaly her pro lepší vizuální vzhled vaší knihovny.',
   'Automatic Boxart Retrieval': 'Automatické stahování obalů',
+  'Auto-Save': 'Automatické ukládání',
+  'Auto-Save Interval': 'Interval automatického ukládání',
+  'Auto-save the game state at a regular interval to prevent progress loss.':
+    'Automaticky ukládat stav hry v pravidelných intervalech, aby nedošlo ke ztrátě postupu.',
+  'Disabled (0 seconds)': 'Vypnuto (0 sekund)',
+  '{{minutes}} minute': '{{minutes}} minuta',
+  '{{minutes}} minute_other': '{{minutes}} minut',
   Back: 'Zpět',
   'Bilinear filtering': 'Bilineární filtrování',
   BIOS: 'BIOS',
